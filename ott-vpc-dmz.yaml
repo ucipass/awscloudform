@@ -27,7 +27,6 @@ Parameters:
     Type: String
     Default: 10.140.254.0/24
 
-
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String

@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 
 region_name = 'us-east-2'
 bucket_name = "aa-cloudform"
-file_name = "test.yaml"
+file_name = "aacloud.yaml"
 
 session = boto3.session.Session(aws_access_key_id=None, aws_secret_access_key=None,
                                 aws_session_token=None, region_name=region_name, botocore_session=None,
