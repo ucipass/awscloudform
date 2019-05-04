@@ -1,0 +1,74 @@
+Description:
+  This template deploys a VPC for OTT DMZ
+
+Parameters:
+
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+    Default: AA-OTT-DMZ
+
+  PublicSubnet1:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+    #Default: {"Fn::ImportValue" : {"Fn::Sub" : "${EnvironmentName}-PublicSubnet1"}}
+    #Default: {"Fn::ImportValue" : {"Fn::Sub" : "AA-OTT-DMZ-PublicSubnet1"}}
+    Default: 123
+
+  myKeyPair: 
+    Description: Amazon EC2 Key Pair
+    Type: "AWS::EC2::KeyPair::KeyName"
+    Default: AA-TEST-W2
+
+  InstanceType:
+    Description: WebServer EC2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+    - t1.micro
+    - t2.micro
+    - m1.small
+
+Mappings: 
+ RegionMap: 
+  "us-east-1": 
+   AMI: "ami-0fba9b33b5304d8b4"
+  "us-east-2": 
+   AMI: "ami-0e04554247365d806"
+  "us-west-1": 
+   AMI: "ami-0ad16744583f21877"
+
+Resources:
+
+  InstanceSecurityGroup: 
+    Type: "AWS::EC2::SecurityGroup"
+    Properties: 
+      VpcId: {"Fn::ImportValue" : {"Fn::Sub" : "${EnvironmentName}-VPC"}}
+      GroupDescription: "Enable SSH and HTTP access via port 22 and 80"
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} SG-SSH-HTTP  
+
+  BastionInstance1: 
+    Type: "AWS::EC2::Instance"
+    Properties: 
+      ImageId: { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]}
+      SubnetId: {"Fn::ImportValue" : {"Fn::Sub" : "${EnvironmentName}-PublicSubnet1"}}
+      InstanceType: 
+        Ref: InstanceType
+      SecurityGroupIds: 
+        - Ref: InstanceSecurityGroup
+      KeyName: !Ref myKeyPair
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} BastionInstance1
+
