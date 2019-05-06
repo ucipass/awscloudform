@@ -1,0 +1,83 @@
+Description:
+  This template deploys a VPC for OTT DMZ
+
+Parameters:
+
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+    Default: AA
+
+  myKeyPair: 
+    Description: Amazon EC2 Key Pair
+    Type: "AWS::EC2::KeyPair::KeyName"
+    Default: AA-TEST-W2
+
+  VPC:
+    Description: Parameters passed from parent
+    Type: AWS::EC2::VPC::Id
+
+  Subnet:
+    Description: Parameters passed from parent
+    Type: AWS::EC2::Subnet::Id
+
+  InstanceType:
+    Description: WebServer EC2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+    - t1.micro
+    - t2.micro
+    - m1.small
+
+Mappings: 
+ RegionMap: 
+  "us-east-1": 
+   AMI: "ami-0273df992a343e0d6"
+  "us-east-2":
+   AMI: "ami-033a0960d9d83ead0"
+  "us-west-1":
+   AMI: "ami-057a852b5ed4b66bc"
+  "us-west-2":
+   AMI: "ami-04ef7170e45541f07"
+
+Resources:
+
+  InstanceSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: "Enable SSH and HTTP access via port 22 and 80"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} SG-SSH-HTTP
+
+  BastionInstance1:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]}
+      SubnetId: !Ref Subnet
+      InstanceType:
+        Ref: InstanceType
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
+      KeyName: !Ref myKeyPair
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} BastionInstance1
+      UserData:
+        Fn::Base64:                                # YAML makes userdata much cleaner
+          !Sub |
+              #!/bin/bash -ex
+              sudo touch /tmp/123
+              curl http://aarato73:Cisco123@dynupdate.no-ip.com/nic/update?hostname=rvous.ddns.net
+              sudo apt-get install -y nginx

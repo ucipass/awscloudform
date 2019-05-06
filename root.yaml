@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  StackVPC1:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-vpc1.yaml
+      TimeoutInMinutes: '60'
+  StackVPC2:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-vpc2.yaml
+      TimeoutInMinutes: '60'
+Outputs:
+  StackRef1:
+    Value: !Ref StackVPC1
+  StackRef2:
+    Value: !Ref StackVPC2
+  OutputFromNestedStack1:
+    Value: !GetAtt StackVPC1.Outputs.VPC
+  OutputFromNestedStack2:
+    Value: !GetAtt StackVPC2.Outputs.VPC

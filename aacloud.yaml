@@ -13,7 +13,7 @@ Parameters:
   myKeyPair: 
     Description: Amazon EC2 Key Pair
     Type: "AWS::EC2::KeyPair::KeyName"
-    Default: AA-TEST
+    Default: AA-TEST-W2
 
   VpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this VPC
@@ -231,61 +231,6 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
 
-  NoIngressSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName: "no-ingress-sg"
-      GroupDescription: "Security group with no ingress rule"
-      VpcId: !Ref VPC
-
-  InstanceSecurityGroup: 
-    Type: "AWS::EC2::SecurityGroup"
-    Properties: 
-      VpcId: !Ref VPC
-      GroupDescription: "Enable SSH and HTTP access via port 22 and 80"
-      SecurityGroupIngress: 
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: "0.0.0.0/0"
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: "0.0.0.0/0"
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName} SG-SSH-HTTP  
-
-  BastionInstance1: 
-    Type: "AWS::EC2::Instance"
-    Properties: 
-      ImageId: "ami-0fba9b33b5304d8b4"
-      SubnetId: 
-        Ref: PublicSubnet1
-      InstanceType: 
-        Ref: InstanceType
-      SecurityGroupIds: 
-        - Ref: InstanceSecurityGroup
-      KeyName: !Ref myKeyPair
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName} BastionInstance1
-
-  InsideInstance1: 
-    Type: "AWS::EC2::Instance"
-    Properties: 
-      ImageId: "ami-0fba9b33b5304d8b4"
-      SubnetId: 
-        Ref: PrivateSubnet1
-      InstanceType: 
-        Ref: InstanceType
-      SecurityGroupIds: 
-        - Ref: InstanceSecurityGroup
-      KeyName: !Ref myKeyPair
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName} InsideInstance1   
-
 Outputs:
   VPC:
     Description: A reference to the created VPC
@@ -315,6 +260,3 @@ Outputs:
     Description: A reference to the private subnet in the 2nd Availability Zone
     Value: !Ref PrivateSubnet2
 
-  NoIngressSecurityGroup:
-    Description: Security group with no ingress rule
-    Value: !Ref NoIngressSecurityGroup
