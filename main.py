@@ -118,17 +118,24 @@ while ans:
     1.Create Stack
     2.Update Stack
     3.Delete Stack
-    4.Exit/Quit
+    4.Show Stack Event
+    5.Exit/Quit
     """)
     ans=raw_input("What would you like to do? ")
     if ans=="1":
         create_stack(bucket_name, "demo-root.yaml", "root" )
+        ans = False
     elif ans=="2":
         update_stack(bucket_name, "demo-root.yaml", "root" )
-    elif ans=="3":
+        ans = False
+    elif ans == "3":
         delete_stack("root")
-    elif ans=="4":
-      print("\n Goodbye")
-      ans = False
+        ans = False
+    elif ans == "4":
+        show_stack_events("root")
+        ans = False
+    elif ans=="5":
+        print("\n Goodbye")
+        ans = False
     elif ans !="":
       print("\n Not Valid Choice Try again")
