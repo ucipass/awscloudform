@@ -5,7 +5,7 @@ Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resource names
     Type: String
-    Default: AA-VPC1
+    Default: DEMO-VPC
 
   VpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this VPC
@@ -151,7 +151,7 @@ Resources:
   StackEC21:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-ec2-1.yaml
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
       TimeoutInMinutes: '60'
       Parameters:
         EnvironmentName: !Sub ${EnvironmentName} EC1
@@ -161,7 +161,7 @@ Resources:
   StackEC22:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-ec2-1.yaml
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
       TimeoutInMinutes: '60'
       Parameters:
         EnvironmentName: !Sub ${EnvironmentName} EC2
@@ -171,7 +171,7 @@ Resources:
   StackEC23:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-ec2-1.yaml
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
       TimeoutInMinutes: '60'
       Parameters:
         EnvironmentName: !Sub ${EnvironmentName} EC3
@@ -181,7 +181,7 @@ Resources:
   StackEC24:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-ec2-1.yaml
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
       TimeoutInMinutes: '60'
       Parameters:
         EnvironmentName: !Sub ${EnvironmentName} EC4

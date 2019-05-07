@@ -8,11 +8,9 @@ from botocore.exceptions import ValidationError
 
 # stack_name = "aa-vpc1"
 #file_name = "aa-vpc1.yaml"
-files = ["root.yaml", "aa-vpc1.yaml", "aa-vpc2.yaml", "aa-ec2-1.yaml", "aa-vpcpeering.yaml"]
+files = ["demo-root.yaml", "demo-vpc.yaml", "demo-vpcpeering.yaml", "demo-ec2-ub.yaml"]
 bucket_name = "aa-cloudforms"
 region_name = 'us-west-1'
-key_name = "AA-TEST"
-
 
 
 session = boto3.session.Session(aws_access_key_id=None, aws_secret_access_key=None,
@@ -113,5 +111,5 @@ def delete_stack(stack_name):
 create_bucket(bucket_name)
 for file_name in files:
     create_s3key(bucket_name,file_name)
-create_stack(bucket_name, "root.yaml", "root" )
-#update_stack(bucket_name, "root.yaml", "root" )
+create_stack(bucket_name, "demo-root.yaml", "root" )
+#update_stack(bucket_name, "demo-root.yaml", "root" )
