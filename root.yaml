@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Description: Root Cloudformation Template
 Resources:
   StackVPC1:
     Type: AWS::CloudFormation::Stack
