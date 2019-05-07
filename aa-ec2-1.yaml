@@ -1,5 +1,5 @@
 Description:
-  This template deploys a VPC for OTT DMZ
+  This template deploys an EC2 INSTANCE
 
 Parameters:
 
@@ -57,6 +57,10 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: "0.0.0.0/0"
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: "0.0.0.0/0"
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName} SG-SSH-HTTP
@@ -73,7 +77,7 @@ Resources:
       KeyName: !Ref myKeyPair
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} BastionInstance1
+          Value: !Sub ${EnvironmentName}
       UserData:
         Fn::Base64:                                # YAML makes userdata much cleaner
           !Sub |

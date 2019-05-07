@@ -1,0 +1,77 @@
+Description: Create a VPC and a VPC Peering connection using the PeerRole to accept.
+Parameters:
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+    Default: AA-OTT-PEERING
+
+  VPCPeer1:
+    Description: Parameters passed from parent
+    Type: AWS::EC2::VPC::Id
+
+  VPCPeer2:
+    Description: Parameters passed from parent
+    Type: AWS::EC2::VPC::Id
+
+  CidrVPC1:
+    Description: Parameters passed from parent
+    Type: String
+
+  CidrVPC2:
+    Description: Parameters passed from parent
+    Type: String
+
+  PublicRouteTableVPC1:
+    Description: Parameters passed from parent
+    Type: String
+
+  PrivateRouteTableVPC1:
+    Description: Parameters passed from parent
+    Type: String
+
+  PublicRouteTableVPC2:
+    Description: Parameters passed from parent
+    Type: String
+
+  PrivateRouteTableVPC2:
+    Description: Parameters passed from parent
+    Type: String
+
+Resources:
+  myVPCPeeringConnection:
+    Type: 'AWS::EC2::VPCPeeringConnection'
+    Properties:
+      VpcId: !Ref VPCPeer1
+      PeerVpcId: !Ref VPCPeer2
+
+  PeeringRouteVPC1:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: !Ref CidrVPC2
+      RouteTableId: !Ref PublicRouteTableVPC1
+      VpcPeeringConnectionId:
+        Ref: myVPCPeeringConnection
+
+  PeeringRouteVPC2:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: !Ref CidrVPC1
+      RouteTableId: !Ref PublicRouteTableVPC2
+      VpcPeeringConnectionId:
+        Ref: myVPCPeeringConnection
+
+  PeeringRouteVPC3:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: !Ref CidrVPC2
+      RouteTableId: !Ref PrivateRouteTableVPC1
+      VpcPeeringConnectionId:
+        Ref: myVPCPeeringConnection
+
+  PeeringRouteVPC4:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: !Ref CidrVPC1
+      RouteTableId: !Ref PrivateRouteTableVPC2
+      VpcPeeringConnectionId:
+        Ref: myVPCPeeringConnection

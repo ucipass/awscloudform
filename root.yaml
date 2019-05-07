@@ -5,17 +5,38 @@ Resources:
     Properties:
       TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-vpc1.yaml
       TimeoutInMinutes: '60'
+      Parameters:
+        EnvironmentName: "AA-VPC1"
+        VpcCIDR: "172.31.0.0/16"
+        PublicSubnet1CIDR: "172.31.11.0/24"
+        PublicSubnet2CIDR: "172.31.12.0/24"
+        PrivateSubnet1CIDR: "172.31.21.0/24"
+        PrivateSubnet2CIDR: "172.31.22.0/24"
   StackVPC2:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-vpc2.yaml
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-vpc1.yaml
       TimeoutInMinutes: '60'
-Outputs:
-  StackRef1:
-    Value: !Ref StackVPC1
-  StackRef2:
-    Value: !Ref StackVPC2
-  OutputFromNestedStack1:
-    Value: !GetAtt StackVPC1.Outputs.VPC
-  OutputFromNestedStack2:
-    Value: !GetAtt StackVPC2.Outputs.VPC
+      Parameters:
+        EnvironmentName: "AA-VPC2"
+        VpcCIDR: "172.32.0.0/16"
+        PublicSubnet1CIDR: "172.32.11.0/24"
+        PublicSubnet2CIDR: "172.32.12.0/24"
+        PrivateSubnet1CIDR: "172.32.21.0/24"
+        PrivateSubnet2CIDR: "172.32.22.0/24"
+  StackVPCPeering:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-vpcpeering.yaml
+      TimeoutInMinutes: '60'
+      Parameters:
+        EnvironmentName: "AA-VPCPeering"
+        VPCPeer1: { "Fn::GetAtt" : "StackVPC1.Outputs.VPC" }
+        VPCPeer2: { "Fn::GetAtt" : "StackVPC2.Outputs.VPC" }
+        PublicRouteTableVPC1: { "Fn::GetAtt" : "StackVPC1.Outputs.PublicRouteTable" }
+        PrivateRouteTableVPC1: { "Fn::GetAtt" : "StackVPC1.Outputs.PrivateRouteTable" }
+        PublicRouteTableVPC2: { "Fn::GetAtt" : "StackVPC2.Outputs.PublicRouteTable" }
+        PrivateRouteTableVPC2: { "Fn::GetAtt" : "StackVPC2.Outputs.PrivateRouteTable" }
+        CidrVPC1: "172.31.0.0/16"
+        CidrVPC2: "172.32.0.0/16"
+

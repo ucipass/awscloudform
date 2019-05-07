@@ -10,31 +10,30 @@ Parameters:
     Type: String
     Default: AA-VPC1
 
-  myKeyPair: 
-    Description: Amazon EC2 Key Pair
-    Type: "AWS::EC2::KeyPair::KeyName"
-    Default: AA-TEST-W2
-
   VpcCIDR:
     Description: Please enter the IP range (CIDR notation) for this VPC
     Type: String
     Default: 172.30.0.0/16
 
-  Subnet1CIDR:
+  PublicSubnet1CIDR:
     Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
     Type: String
     Default: 172.30.11.0/24
 
-Mappings: 
- RegionMap: 
-  "us-east-1": 
-   AMI: "ami-0273df992a343e0d6"
-  "us-east-2": 
-   AMI: "ami-033a0960d9d83ead0"
-  "us-west-1":
-   AMI: "	ami-057a852b5ed4b66bc"
-  "us-west-2":
-   AMI: "ami-04ef7170e45541f07"
+  PublicSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    Type: String
+    Default: 172.30.12.0/24
+
+  PrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 172.30.21.0/24
+
+  PrivateSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 172.30.22.0/24
 
 Resources:
   VPC:
@@ -65,11 +64,44 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
-      CidrBlock: !Ref Subnet1CIDR
+      CidrBlock: !Ref PublicSubnet1CIDR
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -78,6 +110,14 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName} Public Routes
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Private Routes
 
   DefaultPublicRoute:
     Type: AWS::EC2::Route
@@ -93,23 +133,75 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet1
 
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet2
+
   StackEC21:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-ec2-1.yaml
       TimeoutInMinutes: '60'
       Parameters:
+        EnvironmentName: !Sub ${EnvironmentName} EC1
         VPC: !Ref VPC
         Subnet: !Ref PublicSubnet1
+
+  StackEC22:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-ec2-1.yaml
+      TimeoutInMinutes: '60'
+      Parameters:
+        EnvironmentName: !Sub ${EnvironmentName} EC2
+        VPC: !Ref VPC
+        Subnet: !Ref PublicSubnet2
+
+  StackEC23:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-ec2-1.yaml
+      TimeoutInMinutes: '60'
+      Parameters:
+        EnvironmentName: !Sub ${EnvironmentName} EC3
+        VPC: !Ref VPC
+        Subnet: !Ref PrivateSubnet1
+
+  StackEC24:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/aa-ec2-1.yaml
+      TimeoutInMinutes: '60'
+      Parameters:
+        EnvironmentName: !Sub ${EnvironmentName} EC4
+        VPC: !Ref VPC
+        Subnet: !Ref PrivateSubnet2
+
 Outputs:
   VPC:
     Description: A reference to the created VPC
     Value: !Ref VPC
     Export:
-      Name: AA-VPC1
+      Name: !Join [ "", [ !Ref "EnvironmentName", "" ] ]
 
-  PublicSubnet:
-    Description: A list of the public subnets
-    Value: !Ref PublicSubnet1
-    Export:
-      Name: AA-PublicSubnet1
+  PublicRouteTable:
+    Description: A reference to the created RouteTable
+    Value: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Description: A reference to the created RouteTable
+    Value: !Ref PrivateRouteTable

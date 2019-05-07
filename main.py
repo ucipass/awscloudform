@@ -8,7 +8,7 @@ from botocore.exceptions import ValidationError
 
 # stack_name = "aa-vpc1"
 #file_name = "aa-vpc1.yaml"
-files = ["root.yaml", "aa-vpc1.yaml", "aa-vpc2.yaml", "aa-ec2-1.yaml"]
+files = ["root.yaml", "aa-vpc1.yaml", "aa-vpc2.yaml", "aa-ec2-1.yaml", "aa-vpcpeering.yaml"]
 bucket_name = "aa-cloudforms"
 region_name = 'us-west-1'
 key_name = "AA-TEST"
