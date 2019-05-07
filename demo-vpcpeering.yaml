@@ -1,4 +1,4 @@
-Description: Create a VPC and a VPC Peering connection using the PeerRole to accept.
+Description: VPC Peering between VPC with routes added to each route table
 Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resource names

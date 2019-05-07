@@ -1,5 +1,5 @@
 Description:
-  This template deploys an EC2 INSTANCE
+  EC2 Ubuntu 18.04 Instance
 
 Parameters:
 

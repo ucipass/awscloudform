@@ -111,5 +111,24 @@ def delete_stack(stack_name):
 create_bucket(bucket_name)
 for file_name in files:
     create_s3key(bucket_name,file_name)
-create_stack(bucket_name, "demo-root.yaml", "root" )
-#update_stack(bucket_name, "demo-root.yaml", "root" )
+
+ans=True
+while ans:
+    print ("""
+    1.Create Stack
+    2.Update Stack
+    3.Delete Stack
+    4.Exit/Quit
+    """)
+    ans=raw_input("What would you like to do? ")
+    if ans=="1":
+        create_stack(bucket_name, "demo-root.yaml", "root" )
+    elif ans=="2":
+        update_stack(bucket_name, "demo-root.yaml", "root" )
+    elif ans=="3":
+        delete_stack("root")
+    elif ans=="4":
+      print("\n Goodbye")
+      ans = False
+    elif ans !="":
+      print("\n Not Valid Choice Try again")
