@@ -1,5 +1,5 @@
 Description:
-  EC2 Ubuntu 18.04 Instance
+  ASAv 9.10 Instance
 
 Parameters:
 
@@ -49,6 +49,9 @@ Resources:
   InstanceSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
+      Tags:
+      - Key: Name
+        Value: !Sub ${EnvironmentName} SG
       VpcId: !Ref VPC
       GroupDescription: "Enable ALL"
       SecurityGroupIngress:
@@ -56,33 +59,42 @@ Resources:
           CidrIp: "0.0.0.0/0"
 
 
-  NetworkInterfacePrivate1:
+  NetworkInterfaceGIG0:
     Type: AWS::EC2::NetworkInterface
     DependsOn: InstanceSecurityGroup
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Intf Priv1
-      Description: ASAv Private Intf
+          Value: !Sub ${EnvironmentName} GIG0
+      Description: ASAv GIG0/0
       SourceDestCheck: 'false'
       GroupSet:
         - Ref: InstanceSecurityGroup
       SubnetId: !Ref SubnetPrivate
 
+  NetworkInterfaceAttachment:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    DependsOn: ASAvInstance1
+    Properties:
+      InstanceId:
+        Ref: ASAvInstance1
+      NetworkInterfaceId:
+        Ref: NetworkInterfaceGIG0
+      DeviceIndex: 1
 
   ASAvInstance1:
     Type: "AWS::EC2::Instance"
-    DependsOn: NetworkInterfacePrivate1
+    DependsOn: NetworkInterfaceGIG0
     Properties:
       ImageId: { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]}
-      SubnetId: !Ref SubnetPublic
       InstanceType:
         Ref: InstanceType
+      KeyName: !Ref myKeyPair
+      SubnetId: !Ref SubnetPublic
       SecurityGroupIds:
         - Ref: InstanceSecurityGroup
-      KeyName: !Ref myKeyPair
       UserData:
-        Fn::Base64:                                # YAML makes userdata much cleaner
+        Fn::Base64:                                # YAML makes userdata much cleaner DELETE CISCO USER FOR SECURE ACCESS
           !Sub |
             ! required config start
             ! ASA Version 9.10.1.11
@@ -103,6 +115,7 @@ Resources:
             ssh timeout 30
             aaa authentication ssh console LOCAL
             username admin password admin privilege 15
+            username cisco password cisco privilege 15
             username admin attributes
             service-type admin
             ! required config end
@@ -110,14 +123,23 @@ Resources:
         - Key: Name
           Value: !Sub ${EnvironmentName}
 
-  NetworkInterfaceAttachment:
-    Type: AWS::EC2::NetworkInterfaceAttachment
-    DependsOn: ASAvInstance1
-    Properties:
-      InstanceId:
-        Ref: ASAvInstance1
-      NetworkInterfaceId:
-        Ref: NetworkInterfacePrivate1
-      DeviceIndex: 1
+#  ASAvInstance1:
+#    Type: "AWS::EC2::Instance"
+#    DependsOn: [NetworkInterfaceGIG0,NetworkInterfaceMGMT]
+#    Properties:
+#      ImageId: { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]}
+#      InstanceType:
+#        Ref: InstanceType
+#      KeyName: !Ref myKeyPair
+#      NetworkInterfaces:
+#      - NetworkInterfaceId: !Ref 'NetworkInterfaceMGMT'
+#        DeviceIndex: '0'
+#      - NetworkInterfaceId: !Ref 'NetworkInterfaceGIG0'
+#        DeviceIndex: '1'
 
-
+Outputs:
+  PublicIp:
+    Description: ASA Public IP
+    Value: !GetAtt ASAvInstance1.PublicIp
+    Export:
+      Name: !Sub "${AWS::StackName}-ASAPublicIp"

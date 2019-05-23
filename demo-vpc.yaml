@@ -148,15 +148,7 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable
       SubnetId: !Ref PrivateSubnet2
 
-  StackEC21:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
-      TimeoutInMinutes: '60'
-      Parameters:
-        EnvironmentName: !Sub ${EnvironmentName} EC1
-        VPC: !Ref VPC
-        Subnet: !Ref PublicSubnet1
+
 
   StackASAv:
     Type: AWS::CloudFormation::Stack
@@ -169,6 +161,16 @@ Resources:
         SubnetPublic: !Ref PublicSubnet1
         SubnetPrivate: !Ref PrivateSubnet1
 
+#  StackEC21:
+#    Type: AWS::CloudFormation::Stack
+#    Properties:
+#      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
+#      TimeoutInMinutes: '60'
+#      Parameters:
+#        EnvironmentName: !Sub ${EnvironmentName} EC1
+#        VPC: !Ref VPC
+#        Subnet: !Ref PublicSubnet1
+
 #  StackEC22:
 #    Type: AWS::CloudFormation::Stack
 #    Properties:
@@ -179,15 +181,15 @@ Resources:
 #        VPC: !Ref VPC
 #        Subnet: !Ref PublicSubnet2
 
-  StackEC23:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
-      TimeoutInMinutes: '60'
-      Parameters:
-        EnvironmentName: !Sub ${EnvironmentName} EC3
-        VPC: !Ref VPC
-        Subnet: !Ref PrivateSubnet1
+#  StackEC23:
+#    Type: AWS::CloudFormation::Stack
+#    Properties:
+#      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
+#      TimeoutInMinutes: '60'
+#      Parameters:
+#        EnvironmentName: !Sub ${EnvironmentName} EC3
+#        VPC: !Ref VPC
+#        Subnet: !Ref PrivateSubnet1
 
 #  StackEC24:
 #    Type: AWS::CloudFormation::Stack

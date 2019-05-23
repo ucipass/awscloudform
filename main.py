@@ -112,9 +112,9 @@ def delete_stack(stack_name):
     show_stack_events(stack_name)
 
 
-create_bucket(bucket_name)
+# create_bucket(bucket_name)
 for file_name in files:
-    create_s3key(bucket_name,file_name)
+    create_s3key(bucket_name, file_name)
 ans=True
 while ans:
     print ("""
