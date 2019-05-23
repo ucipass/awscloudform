@@ -158,15 +158,26 @@ Resources:
         VPC: !Ref VPC
         Subnet: !Ref PublicSubnet1
 
-  StackEC22:
+  StackASAv:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
+      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-asav.yaml
       TimeoutInMinutes: '60'
       Parameters:
-        EnvironmentName: !Sub ${EnvironmentName} EC2
+        EnvironmentName: !Sub ${EnvironmentName} ASAv
         VPC: !Ref VPC
-        Subnet: !Ref PublicSubnet2
+        SubnetPublic: !Ref PublicSubnet1
+        SubnetPrivate: !Ref PrivateSubnet1
+
+#  StackEC22:
+#    Type: AWS::CloudFormation::Stack
+#    Properties:
+#      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
+#      TimeoutInMinutes: '60'
+#      Parameters:
+#        EnvironmentName: !Sub ${EnvironmentName} EC2
+#        VPC: !Ref VPC
+#        Subnet: !Ref PublicSubnet2
 
   StackEC23:
     Type: AWS::CloudFormation::Stack
@@ -178,15 +189,15 @@ Resources:
         VPC: !Ref VPC
         Subnet: !Ref PrivateSubnet1
 
-  StackEC24:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
-      TimeoutInMinutes: '60'
-      Parameters:
-        EnvironmentName: !Sub ${EnvironmentName} EC4
-        VPC: !Ref VPC
-        Subnet: !Ref PrivateSubnet2
+#  StackEC24:
+#    Type: AWS::CloudFormation::Stack
+#    Properties:
+#      TemplateURL: https://s3.amazonaws.com/aa-cloudforms/demo-ec2-ub.yaml
+#      TimeoutInMinutes: '60'
+#      Parameters:
+#        EnvironmentName: !Sub ${EnvironmentName} EC4
+#        VPC: !Ref VPC
+#        Subnet: !Ref PrivateSubnet2
 
 Outputs:
   VPC:

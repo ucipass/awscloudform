@@ -8,7 +8,7 @@ from botocore.exceptions import ValidationError
 
 # stack_name = "aa-vpc1"
 #file_name = "aa-vpc1.yaml"
-files = ["demo-root.yaml", "demo-vpc.yaml", "demo-vpcpeering.yaml", "demo-ec2-ub.yaml"]
+files = ["demo-root.yaml", "demo-vpc.yaml", "demo-vpcpeering.yaml", "demo-ec2-ub.yaml", "demo-ec2-asav.yaml"]
 bucket_name = "aa-cloudforms"
 region_name = 'us-west-1'
 
@@ -76,6 +76,7 @@ def show_stack_events(stack_name):
         else:
             print(stack_name,"stack does not exists!")
 
+
 def create_stack(bucket_name, file_name, stack_name):
     template_name = "https://s3.amazonaws.com/" + bucket_name + "/" + file_name
     show_stack_events(stack_name)
@@ -86,6 +87,7 @@ def create_stack(bucket_name, file_name, stack_name):
         logging.error(e)
         sys.exit(1)
     show_stack_events(stack_name)
+
 
 def update_stack(bucket_name, file_name, stack_name):
     template_name = "https://s3.amazonaws.com/" + bucket_name + "/" + file_name
@@ -98,6 +100,7 @@ def update_stack(bucket_name, file_name, stack_name):
         sys.exit(1)
     show_stack_events(stack_name)
 
+
 def delete_stack(stack_name):
     show_stack_events(stack_name)
     try:
@@ -108,10 +111,10 @@ def delete_stack(stack_name):
         sys.exit(1)
     show_stack_events(stack_name)
 
+
 create_bucket(bucket_name)
 for file_name in files:
     create_s3key(bucket_name,file_name)
-
 ans=True
 while ans:
     print ("""

@@ -1,0 +1,120 @@
+Description:
+  EC2 Ubuntu 18.04 Instance
+
+Parameters:
+
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+    Default: DEMO-EC2-ASAV
+
+  myKeyPair: 
+    Description: Amazon EC2 Key Pair
+    Type: "AWS::EC2::KeyPair::KeyName"
+    Default: AA-TEST-W2
+
+  VPC:
+    Description: Parameters passed from parent
+    Type: AWS::EC2::VPC::Id
+
+  SubnetPublic:
+    Description: Parameters passed from parent
+    Type: AWS::EC2::Subnet::Id
+
+  SubnetPrivate:
+    Description: Parameters passed from parent
+    Type: AWS::EC2::Subnet::Id
+
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: m4.xlarge
+    AllowedValues:
+    - m4.large
+    - m4.xlarge
+
+Mappings: 
+ RegionMap: 
+  "us-east-1": 
+   AMI: ""
+  "us-east-2":
+   AMI: ""
+  "us-west-1":
+   AMI: "ami-0ea17e02065a25ef3"
+  "us-west-2":
+   AMI: ""
+
+Resources:
+
+  InstanceSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: "Enable ALL"
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          CidrIp: "0.0.0.0/0"
+
+
+  NetworkInterfacePrivate1:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Intf Priv1
+      Description: ASAv Private Intf
+      SourceDestCheck: 'false'
+      GroupSet:
+        - Ref: InstanceSecurityGroup
+      SubnetId: !Ref SubnetPrivate
+
+
+  ASAvInstance1:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]}
+      SubnetId: !Ref SubnetPublic
+      InstanceType:
+        Ref: InstanceType
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
+      KeyName: !Ref myKeyPair
+      UserData:
+        Fn::Base64:                                # YAML makes userdata much cleaner
+          !Sub |
+            ! required config start
+            ! ASA Version 9.10.1.11
+            interface management0/0
+            management-only
+            nameif management
+            security-level 100
+            ip address dhcp setroute
+            no shut
+            !
+            same-security-traffic permit inter-interface
+            same-security-traffic permit intra-interface
+            !
+            crypto key generate rsa modulus 2048
+            ssh version 2
+            ssh key-exchange dh-group14-sha1
+            ssh 0 0 management
+            ssh timeout 30
+            aaa authentication ssh console LOCAL
+            username admin password admin privilege 15
+            username admin attributes
+            service-type admin
+            ! required config end
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}
+
+  NetworkInterfaceAttachment:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      InstanceId:
+        Ref: ASAvInstance1
+      NetworkInterfaceId:
+        Ref: NetworkInterfacePrivate1
+      DeviceIndex: 1
+
+
