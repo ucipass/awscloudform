@@ -58,6 +58,7 @@ Resources:
 
   NetworkInterfacePrivate1:
     Type: AWS::EC2::NetworkInterface
+    DependsOn: InstanceSecurityGroup
     Properties:
       Tags:
         - Key: Name
@@ -71,6 +72,7 @@ Resources:
 
   ASAvInstance1:
     Type: "AWS::EC2::Instance"
+    DependsOn: NetworkInterfacePrivate1
     Properties:
       ImageId: { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]}
       SubnetId: !Ref SubnetPublic
@@ -110,6 +112,7 @@ Resources:
 
   NetworkInterfaceAttachment:
     Type: AWS::EC2::NetworkInterfaceAttachment
+    DependsOn: ASAvInstance1
     Properties:
       InstanceId:
         Ref: ASAvInstance1
